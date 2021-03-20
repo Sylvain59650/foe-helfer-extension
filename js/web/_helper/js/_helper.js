@@ -138,9 +138,8 @@ let HTML = {
 	 * @param args
 	 */
 	Box: (args)=> {
-
 		let close = $('<span />').attr('id', args['id'] + 'close').addClass('window-close'),
-			title = $('<span />').addClass('title').html(args['title'] + ' <small><em> - ' + i18n('Global.BoxTitle') + '</em></small>'),
+			title = $('<span />').addClass('title').html(args['title']),
 
 			head = $('<div />').attr('id', args['id'] + 'Header').attr('class', 'window-head').append(title),
 			body = $('<div />').attr('id', args['id'] + 'Body').attr('class', 'window-body'),
@@ -150,10 +149,19 @@ let HTML = {
 		if(args['auto_close'] !== false){
 			head.append(close);
 		}
-
 		// Minimierenbutton
 		if(args['minimize']){
 			let min = $('<span />').addClass('window-minimize');
+			min.insertAfter(title);
+		}
+		
+		if(args['reduce']){
+			let min = $('<span title="reduce"/>').addClass('window-reduce');
+			min.insertAfter(title);
+		}
+
+		if(args['pinable']){
+			let min = $('<span title="pin"/>').addClass('window-pinable');
 			min.insertAfter(title);
 		}
 
@@ -220,6 +228,14 @@ let HTML = {
 				HTML.MinimizeBox(div);
 			}
 
+			if(args['reduce']) {
+				HTML.ReduceBox(div);
+			}
+
+			if(args['pinable']) {
+				HTML.PinableBox(div);
+			}
+
 			if(args['speaker']) {
 				$('#' + args['speaker']).addClass( localStorage.getItem(args['speaker']) );
 			}
@@ -262,6 +278,61 @@ let HTML = {
 		});
 	},
 
+	Minimize: (boxId)=> {
+		let box = $(boxId);
+		if (box!=null){
+			box.removeClass('open');
+			box.addClass('closed');
+			box.find('.window-body').css("visibility", "hidden");
+		}
+	},
+
+	Maximize: (boxId)=> {
+		let box = $(boxId);
+		if (box!=null){
+			box.removeClass('closed');
+			box.addClass('open');
+			box.find('.window-body').css("visibility", "visible");
+		}
+	},
+
+
+	ReduceBox: (div)=> {
+		let btn = $(div).find('.window-reduce');
+
+		$(btn).bind('click', function(){
+			let box = $(this).closest('.window-box');
+			let elms=box.find(".reducible");
+			elms.toggleClass("hidden");
+			//  let open = box.hasClass('open');
+			//  if(open === true){
+			//  	box.removeClass('open');
+			// 	box.addClass('closed');
+			// 	elms.addClass("hidden");
+			// } else {
+			// 	box.removeClass('closed');
+			// 	box.addClass('open');
+			// 	elms.removeClass("hidden");
+			// }
+		});
+	},
+
+	PinableBox:(div)=>{				
+		let btn = $(div).find('.window-pinable');
+		$(btn).bind('click', function(){
+			let box = $(this).closest('.window-box');
+			box.toggleClass("pined");			
+		});
+	},	
+
+	CloseAllBox:()=>{		
+		let windows=document.querySelectorAll(".window-box");
+		for(let w of windows){
+			if (!$(w).hasClass("pined")) {
+				w.parentElement.removeChild(w);
+			}
+		}
+	},	
 
 	/**
 	 * Macht eine HTML BOX DragAble

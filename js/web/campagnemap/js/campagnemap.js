@@ -126,12 +126,13 @@ let KampagneMap = {
     
             h.push('<div class="campagne-head">');
             h.push('<div class="text-center"><strong>' + i18n('Boxes.Campagne.Reward') + ': </strong></div>');
-
+//<span title="'+ GoodsData[ResourceName]['name']+'" class="goods-sprite-50 sm '+ GoodsData[ResourceName]['id'] +'"></span>
             for (let RewardTyp in Rewards) {
             	if(!Rewards.hasOwnProperty(RewardTyp)){
             		break;
 				}
-                h.push('<div><strong> ' + Rewards[RewardTyp] + ' ' + GoodsData[RewardTyp]['name'] + '</strong></div>');
+                //h.push('<div><strong> ' + Rewards[RewardTyp] + ' ' + GoodsData[RewardTyp]['name'] + '</strong></div><br/>');
+                h.push('<div><strong>' + Rewards[RewardTyp] + ' </strong> <span class="goods-sprite-50 sm '+GoodsData[RewardTyp]['id']+'"></span></div>');
             }
 
             h.push('</div>');

@@ -15,7 +15,6 @@
 // Market
 FoEproxy.addHandler('TradeService', 'getTradeOffers', (data, postData) => {
     let requestMethod = postData[0]['requestMethod'];
-
     if (requestMethod === 'getTradeOffers' || requestMethod === 'acceptOfferById') {
         Market.Trades = data.responseData;
 
@@ -40,9 +39,9 @@ let Market = {
     Trades: [],
     Offer: 0,
     Need: 0,
-    MinQuantity: 1,
-    MaxResults: 100,
-    OnlyAffordable: false,
+    MinQuantity: 10,
+    MaxResults: 500,
+    OnlyAffordable: true,
 
     TradePartnerNeighbor : true,
     TradePartnerGuild : true,
@@ -50,11 +49,11 @@ let Market = {
 
     TradeForHigher: true,
     TradeForEqual: true,
-    TradeForLower: true,
+    TradeForLower: false,
 
     TradeAdvantage: true,
-    TradeFairStock: true,
-    TradeFair: true,
+    TradeFairStock: false,
+    TradeFair: false,
     TradeDisadvantage: false,
 
 	OfferSelect: null,
@@ -93,10 +92,10 @@ let Market = {
                 Market.CalcBody();
             });
 
-            $('#Market').on('blur', '#maxresults', function () {
-                Market.MaxResults = parseFloat($('#maxresults').val());
-                Market.CalcBody();
-            });
+            // $('#Market').on('blur', '#maxresults', function () {
+            //     Market.MaxResults = parseFloat($('#maxresults').val());
+            //     Market.CalcBody();
+            // });
 
             $('#Market').on('click', '.tradepartnerneighbor', function () {
                 Market.TradePartnerNeighbor = !Market.TradePartnerNeighbor;
@@ -167,19 +166,17 @@ let Market = {
         //Filters
         h.push('<div class="dark-bg" style="margin-bottom: 3px;">');
         h.push('<table class="filters">');
-        h.push('<thead>');
-        h.push('<tr>');
-        h.push('<th colspan="2"></td>');
-        h.push('<th>' + i18n('Boxes.Market.TradePartner') + '</th>');
-        h.push('<th>' + i18n('Boxes.Market.TradeForGoods') + '</th>');
-        h.push('<th>' + i18n('Boxes.Market.Rating') + '</th>');
-        h.push('</tr>');
-        h.push('</thead>');
+        // h.push('<thead>');
+        // h.push('<tr>');
+        // h.push('<th colspan="2"></td>');
+        // h.push('<th>' + i18n('Boxes.Market.TradePartner') + '</th>');
+        // h.push('<th>' + i18n('Boxes.Market.TradeForGoods') + '</th>');
+        // h.push('<th>' + i18n('Boxes.Market.Rating') + '</th>');
+        // h.push('</tr>');
+        // h.push('</thead>');
 
         h.push('<tr>');
-        h.push('<td>' + i18n('Boxes.Market.Offer') + '</td>');
-
-        h.push('<td>');
+        h.push('<td colspan=3 title='+i18n('Boxes.Market.Offer')+'>');
 
 		let ID = 0;
 		h.push(`<div class="custom-select-wrapper">
@@ -212,15 +209,7 @@ let Market = {
 
         h.push('</td>');
 
-        h.push('<td><label class="game-cursor"><input class="tradepartnerneighbor game-cursor" ' + (Market.TradePartnerNeighbor ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradePartnerNeighbor') + '</label></td>');
-        h.push('<td><label class="game-cursor"><input class="tradeforhigher game-cursor" ' + (Market.TradeForHigher ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradeForHigher') + '</label></td>');
-        h.push('<td><label class="game-cursor"><input class="tradeadvantage game-cursor" ' + (Market.TradeAdvantage ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradeAdvantage') + '</label></td>');
-        h.push('</tr>');
-
-        h.push('<tr>');
-        h.push(`<td>${i18n('Boxes.Market.Need')}</td>`);
-
-        h.push('<td>');
+        h.push('<td colspan=3 title='+i18n('Boxes.Market.Need')+'>');
 
 		ID = 0;
 		h.push(`<div class="custom-select-wrapper">
@@ -254,53 +243,62 @@ let Market = {
 					</div>
 				</div>`);
         h.push('</td>');
+      
+       //h.push('<td><label class="game-cursor" for="minquantity">' + i18n('Boxes.Market.MinQuantity') + '</label></td>');
+        h.push('<td title="' + i18n('Boxes.Market.TTMinQuantity') + '"><input type="number" id="minquantity" step="1" min="0" max="1000000" value="' + Market.MinQuantity + '"></td>');
+        h.push('</tr>');
 
+        h.push("</table><table>");
+       
+        //h.push('<tr>');
+       // h.push('<td><label class="game-cursor" for="maxresults">' + i18n('Boxes.Market.MaxResults') + '</label></td>');
+        //h.push('<td><input type="number" id="maxresults" step="1" min="1" max="1000000" value="' + Market.MaxResults + '"></td>');
+        // h.push('<td></td>');
+        // h.push('<td></td>');
+        // h.push('<td><label class="game-cursor"><input class="tradedisadvantage game-cursor" ' + (Market.TradeDisadvantage ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradeDisadvantage') + '</label></td>');
+        //h.push('</tr>');
+
+        h.push('<tr>');
+        h.push('<td><label class="game-cursor"><input class="tradepartnerneighbor game-cursor" ' + (Market.TradePartnerNeighbor ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradePartnerNeighbor') + '</label></td>');
+        h.push('<td><label class="game-cursor"><input class="tradeforhigher game-cursor" ' + (Market.TradeForHigher ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradeForHigher') + '</label></td>');
+        h.push('<td><label class="game-cursor"><input class="tradeadvantage game-cursor" ' + (Market.TradeAdvantage ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradeAdvantage') + '</label></td>');
+        h.push('</tr>');
+
+        h.push('<tr>');
         h.push('<td><label class="game-cursor"><input class="tradepartnerguild game-cursor" ' + (Market.TradePartnerGuild ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradePartnerGuild') + '</label></td>');
         h.push('<td><label class="game-cursor"><input class="tradeforequal game-cursor" ' + (Market.TradeForEqual ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradeForEqual') + '</label></td>');
         h.push('<td><label class="game-cursor"><input class="tradefairstock game-cursor" ' + (Market.TradeFairStock ? 'checked' : '') + ' type="checkbox" title="' + i18n('Boxes.Market.TradeFairStockTT') + '">' + i18n('Boxes.Market.TradeFairStock') + '</label></td>');
         h.push('</tr>');
 
         h.push('<tr>');
-        h.push('<td><label class="game-cursor" for="minquantity">' + i18n('Boxes.Market.MinQuantity') + '</label></td>');
-        h.push('<td title="' + i18n('Boxes.Market.TTMinQuantity') + '"><input type="number" id="minquantity" step="1" min="0" max="1000000" value="' + Market.MinQuantity + '"></td>');
         h.push('<td><label class="game-cursor"><input class="tradepartnerfriend game-cursor" ' + (Market.TradePartnerFriend ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradePartnerFriend') + '</label></td>');
         h.push('<td><label class="game-cursor"><input class="tradeforlower game-cursor" ' + (Market.TradeForLower ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradeForLower') + '</label></td>');
         h.push('<td><label class="game-cursor"><input class="tradefair game-cursor" ' + (Market.TradeFair ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradeFair') + '</label></td>');
         h.push('</tr>');
 
-        h.push('<tr>');
-        h.push('<td><label class="game-cursor" for="maxresults">' + i18n('Boxes.Market.MaxResults') + '</label></td>');
-        h.push('<td><input type="number" id="maxresults" step="1" min="1" max="1000000" value="' + Market.MaxResults + '"></td>');
-        h.push('<td></td>');
-        h.push('<td></td>');
-        h.push('<td><label class="game-cursor"><input class="tradedisadvantage game-cursor" ' + (Market.TradeDisadvantage ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.TradeDisadvantage') + '</label></td>');
-        h.push('</tr>');
-
-        h.push('<tr>');
-        h.push('<td colspan="2"><label class="game-cursor"><input class="onlyaffordable game-cursor" ' + (Market.OnlyAffordable ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.OnlyAffordable') + '</label></td>');
-        h.push('<td></td>');
-        h.push('<td></td>');
-        h.push('<td></td>');
+        h.push('<tr>');    
+        h.push('<td colspan="4"><label class="game-cursor"><input class="onlyaffordable game-cursor" ' + (Market.OnlyAffordable ? 'checked' : '') + ' type="checkbox">' + i18n('Boxes.Market.OnlyAffordable') + '</label></td>');
         h.push('</tr>');
 
         h.push('</table>');
         h.push('</div>');
 
         // Table
-        h.push('<table class="foe-table">');
+        h.push('<table class="foe-table scrollable">');
 
         h.push('<thead>');
         h.push('<tr>');
-        h.push('<th colspan="3">' + i18n('Boxes.Market.OfferColumn') + '</th>');
-        h.push('<th colspan="3">' + i18n('Boxes.Market.NeedColumn') + '</th>');
+        h.push('<th colspan="2">' + i18n('Boxes.Market.OfferColumn') + '</th>');
+        h.push('<th colspan="2">' + i18n('Boxes.Market.NeedColumn') + '</th>');
         h.push('<th>' + i18n('Boxes.Market.RateColumn') + '</th>');
         h.push('<th>' + i18n('Boxes.Market.PlayerColumn') + '</th>');
-        h.push('<th>' + i18n('Boxes.Market.PageColumn') + '</th>');
+        //h.push('<th>' + i18n('Boxes.Market.PageColumn') + '</th>');
         h.push('</tr>');
         h.push('</thead>');
 
         let Counter = 0;
         let Pos = 0;
+        h.push('<tbody>');
         for (let i = 0; i < Market.Trades.length; i++)
         {
             if (Counter >= Market.MaxResults) break;
@@ -311,19 +309,24 @@ let Market = {
                     NeedGoodID = Trade['need']['good_id'],
                     OfferEra = Technologies.Eras[GoodsData[OfferGoodID]['era']],
                     NeedEra = Technologies.Eras[GoodsData[NeedGoodID]['era']],
-                    OfferTT = HTML.i18nReplacer(i18n('Boxes.Market.OfferTT'), { 'era': i18n('Eras.' + OfferEra), 'stock': HTML.Format(ResourceStock[OfferGoodID]) });
-                    NeedTT = HTML.i18nReplacer(i18n('Boxes.Market.NeedTT'), { 'era': i18n('Eras.' + NeedEra), 'stock': HTML.Format(ResourceStock[NeedGoodID]) });
+                    OfferTT = HTML.i18nReplacer(GoodsData[Trade['offer']['good_id']]['name']+"<p/>"+i18n('Boxes.Market.OfferTT'), { 'era': i18n('Eras.' + OfferEra), 'stock': HTML.Format(ResourceStock[OfferGoodID]) });
+                    NeedTT = HTML.i18nReplacer(GoodsData[Trade['need']['good_id']]['name']+"<p/>"+i18n('Boxes.Market.NeedTT'), { 'era': i18n('Eras.' + NeedEra), 'stock': HTML.Format(ResourceStock[NeedGoodID]) });
 
                 h.push('<tr>');
                 h.push('<td class="goods-image"><span class="goods-sprite-50 sm '+ GoodsData[Trade['offer']['good_id']]['id'] +'"></span></td>'); 
-                h.push('<td><strong class="td-tooltip" title="' + OfferTT + '">' + GoodsData[Trade['offer']['good_id']]['name'] + '</strong></td>');
+                //h.push('<td><strong class="td-tooltip" title="' + OfferTT + '">' + GoodsData[Trade['offer']['good_id']]['name'].substring(0,1) + '</strong></td>');
                 h.push('<td><strong class="td-tooltip" title="' + OfferTT + '">' + Trade['offer']['value'] + '</strong></td>');
                 h.push('<td class="goods-image"><span class="goods-sprite-50 sm ' + GoodsData[Trade['need']['good_id']]['id'] +'"></span></td>'); 
-                h.push('<td><strong class="td-tooltip" title="' + NeedTT + '">' + GoodsData[Trade['need']['good_id']]['name'] + '</strong></td>');
+                //h.push('<td><strong class="td-tooltip" title="' + NeedTT + '">' + GoodsData[Trade['need']['good_id']]['name'] + '</strong></td>');
                 h.push('<td><strong class="td-tooltip" title="' + NeedTT + '">' + Trade['need']['value'] + '</strong></td>');
                 h.push('<td class="text-center">' + HTML.Format(Math.round(Trade['offer']['value'] / Trade['need']['value'] * 100) / 100) + '</td>');
-                h.push('<td>' + Trade['merchant']['name'] + '</td>');
-                h.push('<td class="text-center">' + (Math.floor(Pos / 10 + 1)) + '-' + (Pos % 10 + 1) + '</td>');
+                let guildeCss="";
+                if (Trade['merchant']['is_guild_member']) {
+                    guildeCss="guilde";
+                }
+                h.push('<td class='+guildeCss+'>' + Trade['merchant']['name'] + '</td>');
+                h.push('<td><button class="acceptOffer" id="o'+Trade.id+'">Ok</button></td>');
+                //h.push('<td class="text-center">' + (Math.floor(Pos / 10 + 1)) + '-' + (Pos % 10 + 1) + '</td>');
                 h.push('</tr>');
 
                 Counter += 1;
@@ -333,11 +336,20 @@ let Market = {
                 Pos += 1;
             }
         }
-
+        h.push('</tbody>');
         h.push('</table>');
 
         $('#MarketBody').html(h.join('')).promise().done(function(){
-			HTML.Dropdown();
+            HTML.Dropdown();
+            $(".acceptOffer").on("click",function(){
+                let offerId=this.id.substring(1);
+                let payload='[{"__class__":"ServerRequest","requestData":['+offerId+'],"requestClass":"TradeService","requestMethod":"acceptOfferById","requestId":299}]';
+                let url=MainParser.MainUrl;
+                let xhr = new XMLHttpRequest();
+			    xhr.open('POST', url);
+			    xhr.setRequestHeader('Content-Type', 'application/json');
+			    xhr.send(payload);
+            })
         });
 
         $('.td-tooltip').tooltip({
@@ -422,7 +434,8 @@ let Market = {
                 }
             }
         }
-        if (Rating < 1 && !Market.TradeDisadvantage) {
+        //if (Rating < 1 && !Market.TradeDisadvantage) {
+        if (Rating < 1) {
             return false;
         }
 

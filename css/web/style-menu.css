@@ -37,6 +37,8 @@ input[type=number] {
 .game-cursor,
 .game-cursor option,
 .window-minimize,
+.window-reduce,
+.window-pinable,
 .window-settings,
 .window-close,
 .window-head:not(span),
@@ -54,6 +56,8 @@ input[type=number] {
 .game-cursor:hover,
 .game-cursor option:hover,
 .window-minimize:hover,
+.window-reduce:hover,
+.window-pinable:hover,
 .window-settings:hover,
 .window-close:hover,
 .window-head:not(span):hover,
@@ -64,6 +68,11 @@ input[type=number] {
 	cursor: url('../images/cursor_hover.cur'), auto;
 }
 
+
+.window-box + .pined > div > .window-pinable{
+	background-position: -190px -1px;
+	background-color: green;
+}
 /**
 	Dropdown
 */
@@ -274,6 +283,12 @@ table.foe-table th,
 	background-color: var(--50-black);
 }
 
+.scrollable {
+	display:block;
+	overflow-y: auto;
+	height:1600px;
+}
+
 table.foe-table tbody tr:nth-child(odd) {
 	background-color: var(--background-table-odd);
 }
@@ -337,8 +352,8 @@ p {
 	right: 0;
 	z-index: 150;
 	width: 64px;
-	height: 270px;
-	top: 360px;
+	height: 670px;
+	top: 35px;
 	padding-top: 24px;
 	padding-bottom: 24px;
 	transition: height 0.2s linear;
@@ -907,4 +922,8 @@ Tooltip */
 
 #reward-bar strong {
 	color: var(--text-bright);
+}
+
+.off span{
+	background-image: url('../images/off.png');
 }

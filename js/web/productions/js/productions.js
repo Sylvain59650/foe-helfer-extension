@@ -19,6 +19,8 @@ let Productions = {
 	BuildingsAll: [],
 	BuildingsProducts: [],
 	BuildingsProductsGroups: [],
+	MoneyProducts:[],
+	SuppliesProducts:[],
 	ShowDaily: false,
 
 	ActiveTab: 1,
@@ -50,6 +52,7 @@ let Productions = {
 		'clan_power',		// Macht der Gilde
 		'clan_goods',		// Gildengüter (Arche, Ehrenstatue etc.)
 		'packaging',		// Güter Gruppe (5 verschieden z.B.)
+		'goods'
 	],
 
 	Boosts: [],
@@ -94,7 +97,7 @@ let Productions = {
 			}
 		}
 
-		Productions.ReadData();
+		Productions.ReadData();		
 	},
 
 
@@ -106,6 +109,8 @@ let Productions = {
 
 		let d = Productions.CombinedCityMapData;
 		Productions.BuildingsAll = [];
+		Productions.MoneyProducts=[];
+		Productions.SuppliesProducts=[];
 
 		let PopulationSum = 0,
 			HappinessSum = 0;
@@ -192,14 +197,25 @@ let Productions = {
 					building['motivatedproducts']['supplies'] = Math.round(building['motivatedproducts']['supplies'] * Productions.Boosts['supplies']);
 				}
 			}
+			else if (building['type'] === 'goods'){
+				let sum=0;
+				for(let resource of Object.keys(building.products)){
+						sum+=building.products[resource];	
+				}
+				building['products']={goods:sum};
+				if (Productions.BuildingsProducts.goods==null){
+					Productions.BuildingsProducts.goods=[];
+				}
+			//	Productions.BuildingsProducts.goods.push(building);
+			}
 
-			// Nach Produkt
 			for (let x in building['products']) {
 				if (!building['products'].hasOwnProperty(x)) {
 					break;
 				}
 
-				if (Productions.Types.includes(x) && x !== 'packaging') {
+				if (Productions.Types.includes(x))
+				 {
 					// Alle Gebäude einzeln auflisten, nach Produkt sortiert
 					Productions.BuildingsProducts[x].push(building);
 
@@ -214,13 +230,13 @@ let Productions = {
 							Productions.BuildingsProductsGroups[x][ni]['eid'] = building['eid'];
 							Productions.BuildingsProductsGroups[x][ni]['era'] = building['era'];
 							Productions.BuildingsProductsGroups[x][ni]['dailyfactor'] = building['dailyfactor'];
-							Productions.BuildingsProductsGroups[x][ni]['products'] = Productions.GetDaily(parseInt(building['products'][x]), building['dailyfactor'], x);
-							Productions.BuildingsProductsGroups[x][ni]['motivatedproducts'] = Productions.GetDaily(parseInt(building['motivatedproducts'][x]), building['dailyfactor'], x);
+							Productions.BuildingsProductsGroups[x][ni]['products'] = Productions.GetDaily(parseInt(building['products'][x],10), building['dailyfactor'], x);
+							Productions.BuildingsProductsGroups[x][ni]['motivatedproducts'] = Productions.GetDaily(parseInt(building['motivatedproducts'][x],10), building['dailyfactor'], x);
 							Productions.BuildingsProductsGroups[x][ni]['count'] = 1;
 
 						} else {
-							Productions.BuildingsProductsGroups[x][index]['products'] += parseInt(building['products'][x]);
-							Productions.BuildingsProductsGroups[x][index]['motivatedproducts'] += parseInt(building['motivatedproducts'][x]);
+							Productions.BuildingsProductsGroups[x][index]['products'] += parseInt(building['products'][x],10);
+							Productions.BuildingsProductsGroups[x][index]['motivatedproducts'] += parseInt(building['motivatedproducts'][x],10);
 							Productions.BuildingsProductsGroups[x][index]['count']++;
 						}
 				}
@@ -244,11 +260,50 @@ let Productions = {
 					Productions.BuildingsProducts['packaging'][mId]['motivatedproducts'][x] = building['motivatedproducts'][x];
 				}
 			}
+		}		
+		
+		moment.locale(i18n('Local'));
+		let cities=JSON.parse(localStorage.getItem('Cities'))||{};
+		if (cities[MainParser.CityName]==null) {
+			cities[MainParser.CityName]={NextProduction:{money:{},supplies:{}}};
 		}
-
-		Productions.showBox();
+		else {
+			//cities[MainParser.CityName]['NextProduction']=Productions.MoneyProducts;
+		}
+		for(let typeProduction of ['money','supplies','goods']) {
+			Productions.BuildingsProducts[typeProduction].sort((x,y)=>{return x.at<y.at?-1:(x.at>y.at?1:0)});
+			let oldAt=0;
+			let oldIn=0;
+			let sumMoney=0;
+			for (let building of Productions.BuildingsProducts[typeProduction]) {
+			building['atRound'] = Productions.roundTo(building['at'],5000);
+			// if (building.in){
+			// 	building['inRound'] = Productions.roundTo(building['in'],60*2);
+			// }
+			// else{
+			// 	building['inRound'] = Productions.roundTo(building['at'],5000);
+			// }
+				if (sumMoney==0) {
+					oldAt=Productions.BuildingsProducts[typeProduction][0].atRound;
+			//		oldIn=Productions.BuildingsProducts[typeProduction][0].inRound;
+				}
+				sumMoney+=building.products[typeProduction]??0;
+				if (building.atRound!=oldAt) {
+					break; // on ne recherche que la prochaine production
+				}
+			}
+			
+			cities[MainParser.CityName]['NextProduction'][typeProduction]={type:typeProduction,at:moment.unix(oldAt).format("HH:mm"), q:sumMoney};			
+			//cities[MainParser.CityName]['NextProduction'][typeProduction]={type:typeProduction,at:moment().add(oldIn,'seconds').format('HH:mm'),  q:sumMoney};			
+			//moment().add(15,'seconds').format('HH:mm')
+		}
+		localStorage.setItem("Cities",JSON.stringify(cities));				
 	},
 
+	
+	roundTo:(d,rounded) =>{
+		return Math.round( (d+rounded/3)/rounded )*rounded;	
+	},
 
 	/**
 	 * alle Produkte auslesen
@@ -464,6 +519,10 @@ let Productions = {
 			return;
 		}
 
+		if (Productions.BuildingsAll.length==0){
+			Productions.init();
+		}
+
 		// CSS in den DOM prügeln
 		HTML.AddCssFile('productions');
 
@@ -531,8 +590,8 @@ let Productions = {
 					if (!MainParser.CityMapData.hasOwnProperty(i)) continue;
 
 					let Entity = MainParser.CityEntities[MainParser.CityMapData[i]['cityentity_id']],
-						width = parseInt(Entity['width']),
-						length = parseInt(Entity['length']),
+						width = parseInt(Entity['width'],10),
+						length = parseInt(Entity['length'],10),
 						RequiredStreet = (Entity['type'] === 'street' ? 0 : Entity['requirements']['street_connection_level'] | 0);
 
 					sizes[MainParser.CityMapData[i]['cityentity_id']] = (width * length) + (Math.min(width, length) * RequiredStreet / 2);
@@ -963,8 +1022,8 @@ let Productions = {
 				hiddenTb = $('.' + t + '-mode:hidden'),
 				vissibleTb = $('.' + t + '-mode:visible');
 
-			vissibleTb.fadeOut(400, function(){
-				hiddenTb.fadeIn(400);
+			vissibleTb.fadeOut(100, function(){
+				hiddenTb.fadeIn(100);
 
 				if( $('.' + t + '-single').is(':visible') ){
 					btn.text(i18n('Boxes.Productions.ModeSingle'));

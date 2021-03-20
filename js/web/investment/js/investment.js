@@ -24,6 +24,23 @@ FoEproxy.addHandler('GreatBuildingsService', 'getContributions', (data) => {
 });
 
 
+FoEproxy.addHandler('GreatBuildingsService', 'getConstruction', (data) => {
+	console.log(data.responseData);
+    debugger;
+    let rankings=data.responseData.rankings;
+    let GM={cityentity_id:data.responseData.cityentity_id,level:data.responseData.level, rewards:[]};
+    
+    for(let r of rankings) {
+        if (r.rank<=5){
+            let reward={rank:r.rank, blueprint:r.reward.blueprints??0, pf:r.reward.strategy_point_amount??0,medals:r.reward?.resources?.medals??0};
+            GM.rewards.push(reward);
+        }
+    }
+    DB.set("GMRewards",GM);
+});
+
+
+
 let Investment = {
 	Data: null,
     Einsatz: 0,

@@ -13,14 +13,14 @@
  */
 
 #Market {
-    top: 100px;
-    right: 100px;
-    width: 650px;
+    top: 50px;
+    right: 0px;
+    width: 340px;
 }
 
 #Market #MarketBody {
     overflow-y: auto;
-	min-height: 400px;
+	min-height: 250px;
     max-height: 750px;
 }
 
@@ -63,4 +63,8 @@
 	overflow: hidden;
 	position: static;
 	display: inline-block;
+}
+.guilde{
+	color:green;
+	font-weight:bolder;
 }

@@ -1,17 +1,18 @@
 FoEproxy.addHandler('HiddenRewardService', 'getOverview', (data, postData) => {
     HiddenRewards.Cache = HiddenRewards.prepareData(data.responseData.hiddenRewards);
     
-    HiddenRewards.RefreshGui();
-    if (HiddenRewards.FirstCycle) { //Alle 60 Sekunden aktualisieren (Startbeginn des Ereignisses könnte erreicht worden sein)
+    setTimeout(HiddenRewards.RefreshGui,10000);
+    setInterval(HiddenRewards.RefreshGui, 60000*15);
+    if (HiddenRewards.FirstCycle) { //Alle 60*15 Sekunden aktualisieren (Startbeginn des Ereignisses könnte erreicht worden sein)
         HiddenRewards.FirstCycle = false;
 
-        setInterval(HiddenRewards.RefreshGui, 60000);
+        
     }
 });
 
 /**
  *
- * @type {{init: HiddenRewards.init, prepareData: HiddenRewards.prepareData, BuildBox: HiddenRewards.BuildBox, RefreshGui: HiddenRewards.RefreshGui, Cache: null, FilteredCache : null, FirstCycle : true}}
+ * @type {{init: HiddenRewards.init, prepareData: HiddenRewards.prepareData, BuildBox: HiddenRewards.BuildBox2, RefreshGui: HiddenRewards.RefreshGui, Cache: null, FilteredCache : null, FirstCycle : true}}
  */
 let HiddenRewards = {
 
@@ -23,26 +24,9 @@ let HiddenRewards = {
 	 * Box in den DOM
 	 */
     init: () => {
-        if ($('#HiddenRewardBox').length < 1) {
-
-            HTML.AddCssFile('hidden-rewards');
-
-            HTML.Box({
-                'id': 'HiddenRewardBox',
-                'title': i18n('Boxes.HiddenRewards.Title'),
-                'ask': i18n('Boxes.HiddenRewards.HelpLink'),
-                'auto_close': true,
-                'dragdrop': true,
-                'minimize': true
-            });
-
-            moment.locale(i18n('Local'));
-
-            HiddenRewards.RefreshGui();
-
-        } else {
-            HTML.CloseOpenBox('HiddenRewardBox');
-        }
+        HTML.AddCssFile('hidden-rewards');
+        moment.locale(i18n('Local'));
+        HiddenRewards.RefreshGui();
     },
 
 
@@ -74,14 +58,15 @@ let HiddenRewards = {
 
             const positionI18nLookupKey = 'HiddenRewards.Positions.' + position;
             const positionI18nLookup = i18n('HiddenRewards.Positions.' + position);
-
+            let positionText=position;    
             if (positionI18nLookupKey !== positionI18nLookup) {
-                position = positionI18nLookup;
+                positionText = positionI18nLookup;
             }
 
             data.push({
                 type: Rewards[idx].type,
-                position: position,
+                position:position,
+                positionText: positionText,
                 starts: Rewards[idx].startTime,
                 expires: Rewards[idx].expireTime,
             });
@@ -112,16 +97,37 @@ let HiddenRewards = {
         }
 
         HiddenRewards.SetCounter();
-
-        if ($('#HiddenRewardBox').length >= 1) {
-            HiddenRewards.BuildBox();
-        }  
+        HiddenRewards.BuildBox2();
     },
 
 
 	/**
 	 * Inhalt der Box in den BoxBody legen
 	 */
+    BuildBox2:() => {
+        let h = [];
+        //debugger;
+        if (HiddenRewards.FilteredCache!=null) 
+        {
+            let wheres=["Route","Nature","Dans l'eau","Rivage"];
+            for(let where of wheres) {
+                let nbWhere=HiddenRewards.FilteredCache.filter((x)=>x.positionText==where);
+                if (nbWhere.length>0) {
+                    h.push('<span>'+nbWhere.length+' '+where+' </span>');
+                }
+            }
+            let html=h.join("");
+            let barHiddenRewards=document.querySelector("#fp-hiddenRewards");
+            if (barHiddenRewards==null) {
+                let barText='<span id="fp-hiddenRewards"></span>';
+                let bar=document.querySelector("#fp-bar");                
+                bar.insertAdjacentHTML("afterbegin", barText);
+                barHiddenRewards=document.querySelector("#fp-hiddenRewards");
+            }
+            barHiddenRewards.innerHTML=html;
+        }
+    },
+
     BuildBox: () => {
         let h = [];
 
@@ -166,10 +172,12 @@ let HiddenRewards = {
 
 
 	SetCounter: ()=> {
-		if(HiddenRewards.FilteredCache.length > 0){
-			$('#hidden-reward-count').text(HiddenRewards.FilteredCache.length).show();
-		} else {
-			$('#hidden-reward-count').hide();
-		}
+        if (HiddenRewards.FilteredCache) {
+            if(HiddenRewards.FilteredCache.length > 0){
+                $('#hidden-reward-count').text(HiddenRewards.FilteredCache.length).show();
+            } else {
+                $('#hidden-reward-count').hide();
+            }
+        }
 	}
 };

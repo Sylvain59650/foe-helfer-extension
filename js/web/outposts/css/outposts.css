@@ -1,7 +1,7 @@
 #outpostConsumables {
 	top: 30%;
 	right: 15%;
-	width: 720px;
+	width: 600px;
 }
 
 #outpostConsumables #outpostConsumablesBody tr.total-row td {
@@ -61,8 +61,8 @@
 }
 
 #outpostConsumables #outpostConsumablesBody .goods-sprite-50 {
-	width: 34px;
-	height: 34px;
+	width: 28px;
+	height: 28px;
 	vertical-align: center;
 }
 

@@ -20,7 +20,7 @@ FoEproxy.addMetaHandler('research', (xhr, postData) => {
 });
 
 FoEproxy.addHandler('ResearchService', 'getProgress', (data, postData) => {
-	Technologies.UnlockedTechologies = data.responseData;
+    Technologies.UnlockedTechologies = data.responseData;
 });
 
 FoEproxy.addHandler('ResearchService', 'spendForgePoints', (data, postData) => {
@@ -31,22 +31,33 @@ FoEproxy.addHandler('ResearchService', 'spendForgePoints', (data, postData) => {
     if (ID === undefined) return;
 
     let TechFound = false;
+    
     for (let i in Technologies.UnlockedTechologies.inProgressTechnologies) {
         if (!Technologies.UnlockedTechologies.inProgressTechnologies.hasOwnProperty(i)) continue;
 
-        if (Technologies.UnlockedTechologies.inProgressTechnologies[i]['tech_id'] === ID) {
+        if (Technologies.UnlockedTechologies.inProgressTechnologies[i].tech_id === ID) {
             TechFound = true;
-            Technologies.UnlockedTechologies.inProgressTechnologies[i]['currentSP'] = CurrentTech['progress']['currentSP'];
-
+            Technologies.UnlockedTechologies.inProgressTechnologies[i] = CurrentTech;            
             break;
         }
     }
 
     if (!TechFound) {
         let TechCount = Technologies.UnlockedTechologies.inProgressTechnologies.length;
-        Technologies.UnlockedTechologies.inProgressTechnologies[TechCount] = CurrentTech['progress'];
+        Technologies.UnlockedTechologies.inProgressTechnologies[TechCount] = CurrentTech.progress;
     }
 
+    let uniques=[];
+    for(let i=Technologies.UnlockedTechologies.inProgressTechnologies.length-1;i>=0;i--){
+        let current=Technologies.UnlockedTechologies.inProgressTechnologies[i];
+        let f=uniques.find(x=>x.id==current.id);
+        if (f==null){
+            uniques.push(current);
+        }
+    }
+    Technologies.inProgressTechnologies=uniques;
+
+    DB.set("inProgressTechnologies",Technologies.inProgressTechnologies);
     if ($('#technologies').length !== 0) {
         Technologies.CalcBody();
     }
@@ -275,7 +286,7 @@ let Technologies = {
 
         h.push('<thead>' +
             '<tr>' +
-            '<th colspan="2">' + i18n('Boxes.Technologies.Resource') + '</th>' +
+            '<th>' + i18n('Boxes.Technologies.Resource') + '</th>' +
             '<th>' + i18n('Boxes.Technologies.DescRequired') + '</th>' +
             '<th>' + i18n('Boxes.Technologies.DescInStock') + '</th>' +
             '<th class="text-right">' + i18n('Boxes.Technologies.DescStillMissing') + '</th>' +
@@ -314,8 +325,8 @@ let Technologies = {
                     let Diff = Stock - Required;
 
                     h.push('<tr>');
-                    h.push('<td class="goods-image"><span class="goods-sprite-50 sm '+ GoodsData[ResourceName]['id'] +'"></span></td>'); 
-                    h.push('<td>' + GoodsData[ResourceName]['name'] + '</td>');
+                    h.push('<td class="goods-image"><span title="'+ GoodsData[ResourceName]['name']+'" class="goods-sprite-50 sm '+ GoodsData[ResourceName]['id'] +'"></span></td>'); 
+                    //h.push('<td>' + GoodsData[ResourceName]['name'] + '</td>');
                     h.push('<td>' + HTML.Format(Required) + '</td>');
                     h.push('<td>' + HTML.Format(Stock) + '</td>');
                     h.push('<td class="text-right text-' + (Diff < 0 ? 'danger' : 'success') + '">' + HTML.Format(Diff) + '</td>');

@@ -124,9 +124,12 @@
 			// Das script wurde (angeblich) direkt ausgeführt und kann wieder entfernt werden.
 			script.remove();
 
+			await promisedLoadCode(chrome.extension.getURL('js/web/_api/js/DB.js?v=' + v));
+
 			// lade die main
 			await promisedLoadCode(chrome.extension.getURL('js/web/_main/js/_main.js?v=' + v));
 
+		
 			// warte zunächst, dass ant und i18n geladen sind
 			await jQueryLoading;
 
@@ -189,8 +192,10 @@
 				'ws-chat',
 				'treasury',
 				'market',
+				'quests',
+				'players',
+				'badplayers'
 			];
-
 			// Scripte laden (nacheinander)
 			for (let i = 0; i < s.length; i++) {
 				await promisedLoadCode(extURL + 'js/web/' + s[i] + '/js/' + s[i] + '.js?v=' + v);

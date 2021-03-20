@@ -1,0 +1,98 @@
+#Quests {
+	top: 100px;
+	left: 100px;
+	padding: 0px 0 0 0;
+	width: 300px;
+}
+
+
+#Quests #QuestsBody {
+	overflow-x: hidden;
+	overflow-y: auto;
+	max-height: 800px;
+	margin-top: 2px;
+}
+
+#Quests #QuestsBody .show-entity {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+}
+
+.quests {
+  margin:0;
+  padding-left:0px;
+  list-style:none;
+  font-size:smaller;
+}
+
+
+.quest {
+	color:red;
+	border:solid 1px black;
+	padding-left:0;
+}
+.ended {
+	background-color:gray;
+}
+
+.quest-quest-list{
+	background-color:yellow;
+	list-style-type: none;
+	padding-left:0;
+}
+.quest-quest-list > li {
+	width:100%;
+	display:flex;
+}
+
+.quest-cond{
+	color:white;	
+}
+
+.quest-description{
+	width:74.9%;		
+}
+
+.daily{
+	background-color:cyan !important;
+}
+
+.quest-progress{
+	width:24.99%
+}
+
+.ended > div {
+	background-color:gray !important;
+	color:black;
+}
+
+ul.nextProduction{
+  list-style-type: none;
+}
+
+.time{
+	width:100px;
+	min-width:100px;
+	display:inline-flex;
+}
+.quantity{
+	padding-left:50px;
+	font-weight: bolder;
+	display:inline-block;
+}
+
+a.Antique{
+  color:white;
+  font-weight: bolder;
+}
+
+.PlayerName {
+	display:inline-block;
+	width:220px;
+}
+
+.Score{
+	display:inline-block;
+	width:50px;
+}

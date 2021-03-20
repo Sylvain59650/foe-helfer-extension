@@ -1,0 +1,20 @@
+#Players #PlayersBody {
+	overflow-x: hidden;
+	overflow-y: auto;
+	max-height: 800px;
+	margin-top: 2px;
+	width:250px;
+}
+
+.small {
+	max-height:12px;
+}
+
+.won{
+	color:green;
+	font-weight: bolder;
+}
+
+.lost {
+	color:red
+}

@@ -84,6 +84,7 @@ let Negotiation = {
 				'ask': i18n('Boxes.Negotiation.HelpLink'),
 				'auto_close': true,
 				'minimize': true,
+				'reduce':true,
 				'dragdrop': true,
 				'saveCords': false
 			});
@@ -152,7 +153,7 @@ let Negotiation = {
 
 			h.push('<tbody>');
 
-			h.push('<tr>');
+			h.push('<tr class="reducible">');
 			h.push('<td colspan="' + (CurrentTry === 1 ? '1' : '4') + '" class="text-warning"><strong>' + i18n('Boxes.Negotiation.Chance') + ': ' + HTML.Format(Math.round(Negotiation.CurrentTable['c'])) + '%</strong></td>');
 			if (CurrentTry === 1) {
 				h.push('<td colspan="2"><label class="game-cursor" for="NegotiationSaveCurrentEraGoods">' + i18n('Boxes.Negotiation.SaveCurrentEraGoods') + '<input id="NegotiationSaveCurrentEraGoods" class="negotation-setting game-cursor" type="checkbox" data-id="NegotiationSaveCurrentEraGoods"' + ((sceg === null || sceg === 'true') ? ' checked' : '') + '></label></td>');
@@ -166,6 +167,8 @@ let Negotiation = {
 			h.push('<tr>');
 
 			h.push('<td class="text-warning">' + i18n('Boxes.Negotiation.Average') + '</td>');
+			h.push('<td><strong>' + Negotiation.GoodByChoose + 'x'+Negotiation.TryCount+'</strong></td>');
+			
 
 			h.push('<td colspan="4"><div id="good-sort" ' + (CurrentTry === 1 ? '  class="goods-dragable"' : '') + '>');
 
@@ -204,7 +207,7 @@ let Negotiation = {
 					GoodAmount = Math.round(GoodAmount * 10) / 10;
 				}
 
-				h.push('<div class="good" data-slug="' + GoodName + '" title="' + i18n('Boxes.Negotiation.Stock') + ' ' + HTML.Format(Stock) + '">' +
+				h.push('<div class="good" data-slug="' + GoodName + '" title="' + GoodsData[GoodInfo.resourceId].name+",\n"+ i18n('Boxes.Negotiation.Stock') + ' ' + HTML.Format(Stock) + '">' +
 					'<span class="goods-sprite ' + GoodName + '"></span><br>' +
 					'<span class="text-' + TextClass + '">' + HTML.Format(GoodAmount) + '</span>' +
 					'</div>');
@@ -214,11 +217,11 @@ let Negotiation = {
 
 			h.push('</tr>');
 
-			if (Negotiation.CurrentTry === 1) {
-				h.push('<tr>');
-				h.push('<td colspan="5" class="text-center"><small>' + i18n('Boxes.Negotiation.DragDrop') + '</small></td>');
-				h.push('</tr>');
-			}
+			// if (Negotiation.CurrentTry === 1) {
+			// 	h.push('<tr>');
+			// 	h.push('<td colspan="5" class="text-center"><small>' + i18n('Boxes.Negotiation.DragDrop') + '</small></td>');
+			// 	h.push('</tr>');
+			// }
 
 			h.push('</tbody>');
 		}
@@ -228,7 +231,7 @@ let Negotiation = {
 		}
 
 		// Verhandlungspartner überschrifteh
-		h.push('<tbody>');
+		h.push('<tbody class="reducible">');
 		h.push('<tr class="thead">');
 
 		for (let i = 0; i < Negotiation.PlaceCount; i++) {
@@ -263,14 +266,14 @@ let Negotiation = {
 		h.push('</table>');
 
 		if (Negotiation.Message != null) {
-			h.push('<p class="text-center text-' + Negotiation.MessageClass + '"><strong>' + Negotiation.Message + '</strong></p>');
+			h.push('<p class="reductible text-center text-' + Negotiation.MessageClass + '"><strong>' + Negotiation.Message + '</strong></p>');
 		}
 
 		if (StockState === 1) {
-			h.push('<p class="text-center text-warning"><strong>' + i18n('Boxes.Negotiation.GoodsLow') + '</strong></p>')
+			h.push('<p class="reductible text-center text-warning"><strong>' + i18n('Boxes.Negotiation.GoodsLow') + '</strong></p>')
 		}
 		else if (StockState === 2) {
-			h.push('<p class="text-center text-danger"><strong>' + i18n('Boxes.Negotiation.GoodsCritical') + '</strong></p>')
+			h.push('<p class="reductible text-center text-danger"><strong>' + i18n('Boxes.Negotiation.GoodsCritical') + '</strong></p>')
 		}
 
 		$('#negotiationBoxBody').html(h.join('')).promise().done(function(){
@@ -325,7 +328,7 @@ let Negotiation = {
 		for (let i = 0; i < limit; i++) {
 			const Guess = Guesses[i];
 			const suggestion = GuessesSuggestions[i];
-			h.push('<tr class="guess goods-opacity">');
+			h.push('<tr class="reducible guess goods-opacity">');
 			for (let place = 0; place < Negotiation.PlaceCount; place++) {
 				const SlotGuess = Guess[place];
 				const SlotSugestion = suggestion ? suggestion[place] : null;
@@ -388,7 +391,7 @@ let Negotiation = {
 				colorStyle = ` style="background-image: linear-gradient(transparent, ${colorVal})"`;
 			}
 
-			h.push(`<tr class="suggestion"${colorStyle}>`);
+			h.push(`<tr class="suggestion reducible"${colorStyle}>`);
 
 			for (let place = 0; place < Negotiation.PlaceCount; place++) {
 				const slotSugestion = nextRoundSuggestion[place];
@@ -471,13 +474,13 @@ let Negotiation = {
 	 * @param {number} [forcedTryCount]
 	 */
 	StartNegotiation: (responseData, forcedTryCount) => {
-		if (responseData.context === Negotiation.CONST_Context_GBG) {
-			if (! $('#negotiation-Btn').hasClass('hud-btn-red')) {
-				$('#negotiation-Btn').addClass('hud-btn-red');
-				_menu.toolTippBox(i18n('Menu.Negotiation.Title'), '<em id="negotiation-Btn-closed" class="tooltip-error">' + i18n('Menu.Negotiation.Warning') + '<br></em>' + i18n('Menu.Negotiation.Desc'), 'negotiation-Btn');
-			}
-			return; //No Negotiation helper for GBG
-		}
+		// if (responseData.context === Negotiation.CONST_Context_GBG) {
+		// 	if (! $('#negotiation-Btn').hasClass('hud-btn-red')) {
+		// 		$('#negotiation-Btn').addClass('hud-btn-red');
+		// 		_menu.toolTippBox(i18n('Menu.Negotiation.Title'), '<em id="negotiation-Btn-closed" class="tooltip-error">' + i18n('Menu.Negotiation.Warning') + '<br></em>' + i18n('Menu.Negotiation.Desc'), 'negotiation-Btn');
+		// 	}
+		// 	return; //No Negotiation helper for GBG
+		// }
 
 		Negotiation.StartNegotiationBackupData = responseData;
 
@@ -492,6 +495,8 @@ let Negotiation = {
 		Negotiation.Message = null;
 		Negotiation.WrongGoodsSelected = false;
 		Negotiation.NeedGoodMissmatchConfirm = false;
+		Negotiation.GoodByChoose=1;
+
 		const PlaceCount = Negotiation.PlaceCount;
 
 		let negotiationResources = responseData.possibleCosts.resources;
@@ -511,6 +516,7 @@ let Negotiation = {
 				amount: negotiationResources[good_id], // menge der Resource pro angebot
 				value: Negotiation.GetGoodValue(good_id) // wert für prioritäts-reihenfolge
 			});
+			Negotiation.GoodByChoose=negotiationResources[good_id];
 		}
 		Negotiation.GoodCount = GoodsOrdered.length;
 

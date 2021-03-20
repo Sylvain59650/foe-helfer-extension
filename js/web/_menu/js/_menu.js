@@ -24,16 +24,20 @@ let _menu = {
 	HudHeight: 0,
 
 	Items: [
-		'calculator',
+		'market',
+		'technologies',
+		'campagneMap',
+		'hiddenRewards',
+		
 		'partCalc',
 		'outpost',
 		'productions',
-		'hiddenRewards',
+		
 		'negotiation',
 		'infobox',
 		'notice',
-		'technologies',
-		'campagneMap',
+		
+		
 		'citymap',
 		'unit',
 		'settings',
@@ -42,7 +46,9 @@ let _menu = {
 		'kits',
 		'alerts',
 		'greatbuildings',
-		'market',
+		'calculator',
+		'quests',
+		'Players'
 	],
 
 
@@ -487,7 +493,7 @@ let _menu = {
 		let btn_FPs = $('<span />');
 
 		btn_FPs.bind('click', function () {
-			Productions.init();
+			Productions.showBox();
 		});
 
 		btn_FPsBG.append(btn_FPs);
@@ -815,6 +821,39 @@ let _menu = {
 		btn_MarketBG.append(btn_Market);
 
 		return btn_MarketBG;
+	},
+	
+	quests_Btn: () => {
+		let btn = $('<div />').attr({ 'id': 'quests-Btn', 'data-slug': 'quests' }).addClass('hud-btn hud-btn-red');
+		_menu.toolTippBox(i18n('Menu.quests.Title'), i18n('Menu.quests.Desc'), 'quests-Btn');
+		let btnSp = $('<span />');
+		btn.bind('click', function () {
+				Quests.ToogleShow();
+		});
+		btn.append(btnSp);
+		return btn;
+	},
+	
+	Players_Btn: () => {
+		let btn = $('<div />').attr({ 'id': 'Players-Btn', 'data-slug': 'Players' }).addClass('hud-btn hud-btn-red');
+		_menu.toolTippBox(i18n('Menu.Players.Title'), i18n('Menu.Players.Desc'), 'Players-Btn');
+		let btnSp = $('<span />');
+		btn.bind('click', function () {
+			PlayersPopin.ToogleShow();
+		});
+		btn.append(btnSp);
+		return btn;
+	},
+	
+	BadPlayers_Btn: () => {
+		let btn = $('<div />').attr({ 'id': 'BadPlayers-Btn', 'data-slug': 'BadPlayers' }).addClass('hud-btn hud-btn-red');
+		_menu.toolTippBox(i18n('Menu.BadPlayers.Title'), i18n('Menu.BadPlayers.Desc'), 'BadPlayers-Btn');
+		let btnSp = $('<span />');
+		btn.bind('click', function () {
+			BadPlayersPopin.ToogleShow();
+		});
+		btn.append(btnSp);
+		return btn;
     }
 
 };

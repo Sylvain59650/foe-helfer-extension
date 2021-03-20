@@ -34,13 +34,8 @@ let Outposts = {
 	DisplaySums: false,
 	DisplayAllTiles: false,
 
-
-	/**
-	 * Füg eine Box in den DOM ein
-	 */
-	BuildInfoBox: ()=> {
-
-		if( $('#outpostConsumables').length === 0 )
+	Show: (visible)=>{
+		if(visible && $('#outpostConsumables').length === 0 )
 		{
 			let args = {
 				'id': 'outpostConsumables',
@@ -80,6 +75,14 @@ let Outposts = {
 		} else {
 			HTML.CloseOpenBox('outpostConsumables');
 		}
+	},
+
+	/**
+	 * Füg eine Box in den DOM ein
+	 */
+	BuildInfoBox: ()=> {
+		Outposts.Show(true);
+		
 
 		if (Outposts.Advancements === null) {
 			let OutpostBuildings = localStorage.getItem('OutpostBuildings');
@@ -206,7 +209,7 @@ let Outposts = {
 		// Kopfzeile
 
 		// summen checkbox
-		t.push('<p class="info-line"><span><label>' + i18n('Boxes.Outpost.ShowSums') + '<input type="checkbox" onclick="Outposts.asSum(this.checked)"'+(displaySums?' checked':'')+'/></label></span><span>');
+	/*	t.push('<p class="info-line"><span><label>' + i18n('Boxes.Outpost.ShowSums') + '<input type="checkbox" onclick="Outposts.asSum(this.checked)"'+(displaySums?' checked':'')+'/></label></span><span>');
 
 		// Durchlauf Informationen
 		if (currentRun) {
@@ -228,12 +231,13 @@ let Outposts = {
 			+ '</span>'
 		);
 		t.push('</p>');
-
+*/
 
 		// Kosten Tabelle
 
 		t.push('<table class="foe-table">');
 
+		/*
 		// kosten für die nächste(n) Erweiterung(en)
 		if (nextTilesCosts) {
 			let i = 0;
@@ -250,7 +254,7 @@ let Outposts = {
 				} else {
 					t.push('<td>+'+i+'</td>');
 				}
-				t.push('<td></td>');
+				//t.push('<td></td>');
 
 				// Güter durchgehen
 				for (let resourceID of resourceIDs) {
@@ -295,12 +299,12 @@ let Outposts = {
 				i++;
 			}
 		}
-
+*/
 
 		// Überschriften
 		t.push('<tr>');
 		t.push('<th>' + i18n('Boxes.Outpost.TitleBuildings') + '</th>');
-		t.push('<th class="text-center">' + i18n('Boxes.Outpost.TitleFree') + '</th>');
+		//t.push('<th class="text-center">' + i18n('Boxes.Outpost.TitleFree') + '</th>');
 
 		// Güter durchgehen
 		for (let resourceID of resourceIDs) {
@@ -314,13 +318,13 @@ let Outposts = {
 		// Freischaltungen
 		for (let advancement of advancements) {
 			let unlocked = advancement.isUnlocked;
-
+			if (!unlocked) {
 			t.push('<tr>');
 
 			t.push('<td>' + advancement.name + '</td>');
 
 			// X oder Haken
-			t.push('<td class="text-center">' + (unlocked ? '&#10004;' : '&#10060;') + '</td>');
+		//	t.push('<td class="text-center">' + (unlocked ? '&#10004;' : '&#10060;') + '</td>');
 
 			let cost = advancement.requirements.resources;
 
@@ -412,6 +416,7 @@ let Outposts = {
 			}
 
 			t.push('</tr>');
+			}
 		}
 
 		// Extra Tiles
@@ -432,7 +437,7 @@ let Outposts = {
 			if (found) {
 				t.push('<tr class="total-row">');
 
-				t.push('<td><strong>' + i18n('Boxes.Outpost.ExpansionsSum') + '</strong></td><td></td>');
+				t.push('<td><strong>' + i18n('Boxes.Outpost.ExpansionsSum') + '</strong></td>');
 
 				for (let resourceID of resourceIDs) {
 					const resourceCost = plannedTilesCostSum[resourceID];
@@ -472,7 +477,7 @@ let Outposts = {
 		// Benötigt
 		t.push('<tr class="total-row">');
 
-		t.push('<td>' + i18n('Boxes.Outpost.DescRequired') + '</td><td></td>');
+		t.push('<td>' + i18n('Boxes.Outpost.DescRequired') + '</td>');
 
 		for (let resourceID of resourceIDs) {
 			t.push('<td class="text-center">' + HTML.Format(sums[resourceID]) + '</td>');
@@ -483,7 +488,7 @@ let Outposts = {
 		// Vorhanden
 		t.push('<tr class="resource-row">');
 
-		t.push('<td>' + i18n('Boxes.Outpost.DescInStock') + '</td><td></td>');
+		t.push('<td>' + i18n('Boxes.Outpost.DescInStock') + '</td>');
 
 		for (let resourceID of resourceIDs) {
 			t.push('<td class="text-center">' + HTML.Format(currStock[resourceID]) + '</td>');
@@ -495,7 +500,7 @@ let Outposts = {
 		// Überschuss/Fehlt
 		t.push('<tr class="total-row">');
 
-		t.push('<td><strong>' + i18n('Boxes.Outpost.DescStillMissing') + '</strong></td><td colspan=""></td>');
+		t.push('<td><strong>' + i18n('Boxes.Outpost.DescStillMissing') + '</strong></td>');
 
 		for (let resourceID of resourceIDs) {
 			let difference = currStock[resourceID] - sums[resourceID];
@@ -627,6 +632,13 @@ FoEproxy.addHandler('OutpostService', 'getAll', (/** @type {FoE_NETWORK_OutpostS
 	// store all informations in case of outpost change
 	Outposts.OutpostsData = data.responseData;
 	Outposts.UpdateOutpostData();
+	HTML.CloseOpenBox('outpostConsumables');
+});
+
+FoEproxy.addHandler('OutpostService', 'getAll', (/** @type {FoE_NETWORK_OutpostService_getAll} */ data, _postData) => {
+	if (_postData.requestMethod=='cancel'){
+		HTML.CloseOpenBox('outpostConsumables');
+	}
 });
 
 FoEproxy.addHandler('OutpostService', 'start', (/** @type {FoE_NETWORK_OutpostService_start} */ data, _postData) => {
@@ -640,6 +652,8 @@ FoEproxy.addHandler('OutpostService', 'start', (/** @type {FoE_NETWORK_OutpostSe
 		Outposts.OutpostsData.push(culture);
 	}
 	Outposts.UpdateOutpostData();
+
+//	Outposts.Show(true);
 });
 
 // OutpostService.cancel wird von einem OutpostService.getAll gefolgt

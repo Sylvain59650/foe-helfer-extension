@@ -14,16 +14,16 @@
  */
 
 #technologies {
-	top: 30%;
-	right: 15%;
-	width: 450px;
+	top: 6%;
+	left:0;
+	width: 300px;
 }
 
 #technologies #technologiesBody {
 	overflow-x: hidden;
 	overflow-y: auto;
 	/* min-height: 300px; */
-	max-height: 500px;
+	max-height: 1024px;
 }
 
 #technologies #technologiesBody .techno-head {

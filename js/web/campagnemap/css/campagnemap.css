@@ -14,16 +14,16 @@
  */
 
 #campagne {
-	top: 30%;
-	right: 15%;
-	width: 450px;
+	top: 3%;
+	right: 1%;
+	width: 270px;
 }
 
 #campagne #campagneBody {
 	overflow-x: hidden;
 	overflow-y: auto;
 	/* min-height: 100px; */
-	max-height: 500px;
+	max-height: 800px;
 }
 
 #campagne #campagneBody .campagne-head {
